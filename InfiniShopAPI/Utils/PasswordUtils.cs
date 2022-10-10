@@ -1,0 +1,35 @@
+﻿using System.Security.Cryptography;
+
+namespace InfiniShopAPI.Utils
+{
+    public class PasswordUtils
+    {
+
+        //------------------------------------------------------------------------------------------------------------
+
+        //With the out we can return the specified variables
+        //In this case passwordHash and passwordSalt
+        public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+
+            using (var hmac = new HMACSHA512())
+            {
+
+
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        public static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
+
+        }
+    }
+}
