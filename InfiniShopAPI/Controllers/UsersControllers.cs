@@ -33,7 +33,7 @@ namespace API.Controllers
         }
 
         //Get user by id - 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<AppUser>> GetUser(int id)
         {
@@ -103,6 +103,19 @@ namespace API.Controllers
             //Just return a not content after delete
             return NoContent();
 
+        }
+
+        [AllowAnonymous]
+        [HttpGet("getUserByEmail/{email}")]
+        public async Task<ActionResult<AppUser>> GetUserByEmail(string email)
+        {
+            //Function to get entity by ID
+            var userItem = await _dataContext.Users.Where(u => u.Email == email).SingleAsync();
+            if (userItem == null)
+            {
+                return NotFound();
+            }
+            return userItem;
         }
 
     }

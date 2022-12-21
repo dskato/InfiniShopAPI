@@ -5,6 +5,7 @@ using API.Interfaces;
 using API.Services;
 using Google.Apis.Auth;
 using InfiniShopAPI.DTOs;
+using InfiniShopAPI.Entities;
 using InfiniShopAPI.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +57,7 @@ namespace API.Controllers
                     Email = request.email.ToLower(),
                     Name = request.firstName,
                     LastName = request.lastName,
+                    Role = "Normal"
                 };
                 //load to db
                 await _context.Users.AddAsync(user);
@@ -74,6 +76,90 @@ namespace API.Controllers
             
         }
 
+        
+       
+        [HttpPost("RegisterMechanic")]
+        public async Task<ActionResult<UserDTO>> RegisterMechanic(RegisterMechanicDTO registerMechanicDTO)
+        {
+            //Validation to check if user exists
+            if (await UserExists(registerMechanicDTO.email) == true)
+            {
+                return BadRequest("Email is taken.");
+            }
+            //encrypt the password
+            PasswordUtils.CreatePasswordHash(registerMechanicDTO.password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            Console.WriteLine("REGISTER DTO: "+ registerMechanicDTO.lastName);
+            
+
+            //Adress setting
+            var adressChild = new Adress
+            {
+                AdressName = registerMechanicDTO.address,
+                CityId = registerMechanicDTO.cityId
+            };
+            List<Adress> adresses = new List<Adress>();
+            adresses.Add(adressChild);
+
+            //Mechanic services setting
+            List<MechanicServices> services = new List<MechanicServices>();
+            for (int x = 0; x < registerMechanicDTO.serviceLs.Length; x++)
+            {
+                services.Add(new MechanicServices
+                {
+
+                    MechanicServicesName = registerMechanicDTO.serviceLs[x].ServicesName,
+                    Price = registerMechanicDTO.serviceLs[x].Price,
+                    TypeOfVehicle = registerMechanicDTO.typeOfVehicle
+
+                });
+            }
+
+            //Mechanic setting
+            BranchMechanics brM = new BranchMechanics
+            {
+                Name = registerMechanicDTO.nameSucursal,
+                ContactPhone = registerMechanicDTO.contactPhone,
+                WebPage = registerMechanicDTO.webPage,
+                Description = registerMechanicDTO.description,
+                typeOfVehicle = registerMechanicDTO.typeOfVehicle,
+                Adresses = adresses,
+                MechanicServices = services
+
+
+            };
+            List<BranchMechanics> bmList = new List<BranchMechanics>();
+            bmList.Add(brM);
+            //parentUser.BranchMechanics.Add(brM);
+            //User info setting
+            var parentUser = new AppUser
+            {
+                Email = registerMechanicDTO.email.ToLower(),
+                Name = registerMechanicDTO.firstName,
+                LastName = registerMechanicDTO.lastName,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                Role = "Normal",
+                BranchMechanics = bmList
+
+            };
+
+            //Save
+            await _context.Users.AddAsync(parentUser);
+            await _context.SaveChangesAsync();
+
+            return Ok(new UserDTO
+            {
+
+                Email = parentUser.Email,
+                Token = _tokenService.CreateToken(parentUser)
+
+            });
+
+
+
+        }
+
         [HttpPost("Register")]
         public async Task<ActionResult<UserDTO>> Register(RegisterDTO registerDTO)
         {
@@ -90,7 +176,8 @@ namespace API.Controllers
                 Name = registerDTO.FirstName,
                 LastName = registerDTO.LastName,
                 PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt
+                PasswordSalt = passwordSalt,
+                Role = "Normal"
             };
             //load to db
             await _context.Users.AddAsync(user);

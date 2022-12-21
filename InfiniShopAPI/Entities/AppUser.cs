@@ -1,3 +1,4 @@
+using InfiniShopAPI.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,7 +16,7 @@ namespace API.Entities
         public string Name { get; set; }
         [Required]
         public string LastName { get; set; }
-        public string Adress { get; set; } = String.Empty;
+    
         public string PhoneNumber { get; set; } = String.Empty;
         [Required]
         public string Email { get; set; }
@@ -23,7 +24,13 @@ namespace API.Entities
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
 
+        [Required]
+        public string Role { get; set; } //Normal user, Mechanical user
 
+
+        //REFERENCES
+        public List<BranchMechanics> BranchMechanics { get; set; }
+        public List<Adress> Adresses { get; set; }
 
 
     }

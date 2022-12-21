@@ -23,7 +23,7 @@ namespace API.Extensions
             //We can use SQL too
             services.AddDbContext<DataContext>(options =>
             {
-                options.UseSqlServer("server=DESKTOP-3GEAH5D\\SQLEXPRESS; database=InfiniShopDB; Trusted_Connection=True;");
+                options.UseSqlServer("server=DESKTOP-3GEAH5D\\SQLEXPRESS; database=WikiMovil; Trusted_Connection=True;");
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
