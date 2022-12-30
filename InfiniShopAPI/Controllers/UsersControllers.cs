@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
+using InfiniShopAPI.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +43,7 @@ namespace API.Controllers
             return userItem;
         }
 
-        
+
         // POST PETITION
         [HttpPost]
         public async Task<ActionResult<AppUser>> AddUser(AppUser appUser)
@@ -83,6 +80,27 @@ namespace API.Controllers
 
         }
 
+
+        [HttpPatch("updateUserProfile")]
+        public async Task<IActionResult> UpdateUserProfile(UserProfile userProfile)
+        {
+
+            var currentUser = await _dataContext.Users.FindAsync(userProfile.Id);
+            if (currentUser == null)
+            {
+                return NotFound();
+            }
+
+            currentUser.Name = userProfile.Name;
+            currentUser.LastName = userProfile.Lastname;
+            currentUser.PhoneNumber = userProfile.Phone;
+
+            _dataContext.Users.Update(currentUser);
+
+            await _dataContext.SaveChangesAsync();
+            return Ok();
+
+        }
 
         //PETITION TO DELETE BY ID
         [HttpDelete]

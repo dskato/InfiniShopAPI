@@ -76,8 +76,53 @@ namespace API.Controllers
             
         }
 
-        
-       
+        [HttpPost("RegisterBranch")]
+        public async Task<ActionResult> RegisterBranch(RegisterBranchDTO registerBranchDTO) {
+
+            //Adress setting
+            var adressChild = new Adress
+            {
+                AdressName = registerBranchDTO.address,
+                CityId = registerBranchDTO.cityId
+            };
+            List<Adress> adresses = new List<Adress>();
+            adresses.Add(adressChild);
+
+            //Mechanic services setting
+            List<MechanicServices> services = new List<MechanicServices>();
+            for (int x = 0; x < registerBranchDTO.serviceLs.Length; x++)
+            {
+                services.Add(new MechanicServices
+                {
+
+                    MechanicServicesName = registerBranchDTO.serviceLs[x].ServicesName,
+                    Price = registerBranchDTO.serviceLs[x].Price,
+                    TypeOfVehicle = registerBranchDTO.typeOfVehicle
+
+                });
+            }
+
+            //Mechanic setting
+            BranchMechanics brM = new BranchMechanics
+            {
+                AppUserId = registerBranchDTO.AppUserId,
+                Name = registerBranchDTO.nameSucursal,
+                ContactPhone = registerBranchDTO.contactPhone,
+                WebPage = registerBranchDTO.webPage,
+                Description = registerBranchDTO.description,
+                typeOfVehicle = registerBranchDTO.typeOfVehicle,
+                Adresses = adresses,
+                MechanicServices = services
+
+            };
+            await _context.BranchMechanics.AddAsync(brM);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+
+
+
         [HttpPost("RegisterMechanic")]
         public async Task<ActionResult<UserDTO>> RegisterMechanic(RegisterMechanicDTO registerMechanicDTO)
         {

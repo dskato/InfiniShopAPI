@@ -38,6 +38,37 @@ namespace InfiniShopAPI.Controllers
 
         }
 
+        [AllowAnonymous]
+        [HttpGet("GetProvinceById/{id}")]
+        public async Task<ActionResult<Province>> GetProvinceById(int id)
+        {
+            var province = await _dataContext.Provinces.FindAsync(id);
+            
+            if (province == null)
+            {
+                return NotFound();
+            }
+
+            return province;
+
+        }
+
+        [AllowAnonymous]
+        [HttpGet("GetCityById/{id}")]
+        public async Task<ActionResult<City>> GetCityById(int id)
+        {
+            var city = await _dataContext.Cities.FindAsync(id);
+
+            if (city == null)
+            {
+                return NotFound();
+            }
+
+            return city;
+
+        }
+
+
         //Get province by country id - 
         [AllowAnonymous]
         [HttpGet("GetProvincesByCountryId/{id}")]
